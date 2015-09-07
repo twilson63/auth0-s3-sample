@@ -11,15 +11,15 @@ This sample uses Auth0 and its integration with AWS APIs (S3, SES, DynamoDB, EC2
 1. User logs in with Auth0 (any identity provider)
 2. Auth0 returns a JSON Web Token to the browser
 3. The browser calls Auth0 `/delegation` endpoint to validate the token and exchange it for AWS temporal credentials
-  
+
   ```js  
   var aws_arns = { role: 'arn:aws:iam::account_number:role/role_name', principal: 'arn:aws:iam::account_number:saml-provider/provider_name' };
-  auth0.getDelegationToken(aws_api_auth0_clientid, jwt, aws_arns, function(err, result) {
+  auth0.getDelegationToken({ id_token: settings.id_token, api: 'aws', role: aws_arns.role,  principal: aws_arns.principal }, function(err, result) {
     var aws_credentials = result.Credentials; // AWS temp credentials
     // call AWS API e.g. bucket.getObject(...)
   });
   ```
-  
+
 4. With the AWS credentials you can now call the AWS APIs and have policies using ${saml:sub} to create policies to authorize users to access a bucket, rows or columns in DynamoDB, sending an email, etc.
 
 ## FAQ
@@ -47,7 +47,7 @@ A role needs to be created in the IAM console containing these two statements. T
       "Action": [
         "*"
       ],
-      "Resource": [ 
+      "Resource": [
           "arn:aws:s3:::YOUR_BUCKET/dropboxclone/${saml:sub}",
           "arn:aws:s3:::YOUR_BUCKET/dropboxclone/${saml:sub}/*"]
    },
@@ -56,7 +56,7 @@ A role needs to be created in the IAM console containing these two statements. T
       "Action": ["s3:ListBucket"],
       "Effect": "Allow",
       "Resource": ["arn:aws:s3:::YOUR_BUCKET"],
-      "Condition":{ 
+      "Condition":{
         "StringEquals": { "s3:prefix":["dropboxclone/${saml:sub}"] }
        }
     }
@@ -68,8 +68,12 @@ The `${saml:sub}` variable in the policy is replaced in runtime by AWS with the 
 
 ## Running it locally
 
-Install `serve` 
-    
+Modify the file in **js/config.js** to match your account settings.
+
+Configure CORS for your bucket.
+
+Install `serve`
+
     npm install -g serve
 
 Run it on port 1338
@@ -77,4 +81,3 @@ Run it on port 1338
     serve -p 1338
 
 And point your browser to <http://localhost:1338>
-

@@ -14,9 +14,9 @@
     <![endif]-->
   </head>
   <body id="drop-here">
-    <div class="files-page"> 
+    <div class="files-page">
       <div class="container">
-        
+
         <header class="site-header clearfix">
           <div class="col-xs-4">
             <h1><a href="">S3-box</a></h1>
@@ -25,7 +25,7 @@
             <div class="login-info"></div>
           </div>
         </header>
-        
+
 
 
         <div class="col-sm-9 right">
@@ -63,21 +63,21 @@
     <script id="login-info-template" type="text/x-handlebars-template">
       <img src="{{avatar}}"><span>Welcome {{name}} </span> <a href="#_" class="logout">Logout</a>
     </script>
-    
+
     <script id="files-template" type="text/x-handlebars-template">
       {{#each files}}
-        <tr> 
+        <tr>
           <td> <i class="glyphicon glyphicon-file"></i></td>
           <td> <a target="_blank" href="{{url}}" class="file-item">{{name}}</a></td>
           <td>{{date}}</td>
           <td><a  data-key="{{key}}"  class="share-link glyphicon glyphicon-link"></a></td>
           <td><i title="Remove" data-key="{{key}}" class="remove glyphicon glyphicon-trash"></i></td>
         </tr>
-      
+
       {{/each}}
     </script>
-    <script src="//sdk.amazonaws.com/js/aws-sdk-2.0.0-rc1.min.js"></script>
-    <script src="//cdn.auth0.com/w2/auth0-2.1.4.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.49.min.js"></script>
+    <script src="//cdn.auth0.com/w2/auth0-6.6.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/store.js/1.3.14/store.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
@@ -100,14 +100,14 @@
           }
       };
 
-      window.bucket = new AWS.S3({params: {Bucket: 'assets.tests.auth0.com'}});
-      window.folder_prefix = 'dropboxclone/';
-      
+      window.bucket = new AWS.S3({params: {Bucket: window.config.bucket}});
+      window.folder_prefix = window.config.folder_prefix;
+
       function initialize_security_context(callback) {
         if (!user.get()) return location.href = store.get('path');
-        
-        // if token is not expired, return 
-        if (user.get().aws_creds && 
+
+        // if token is not expired, return
+        if (user.get().aws_creds &&
             new Date(user.get().aws_creds.Expiration) > new Date()) return callback();
 
         get_aws_token(window.config, function(err, delegationResult) {
@@ -130,21 +130,21 @@
           location.href = index;
         });
 
-        bucket.config.credentials = 
+        bucket.config.credentials =
             new AWS.Credentials(user.get().aws_creds.AccessKeyId,
                                 user.get().aws_creds.SecretAccessKey,
                                 user.get().aws_creds.SessionToken);
 
         bind_upload(bucket);
-        refresh_list(bucket); 
+        refresh_list(bucket);
 
-  
+
 
 
       });
 
 
 
-    </script>      
+    </script>
   </body>
 </html>

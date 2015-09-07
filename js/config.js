@@ -1,4 +1,6 @@
 window.config = {
+  bucket:         'assets.tests.auth0.com',
+  folder_prefix:  'dropboxclone/',
   role:           'arn:aws:iam::010616021751:role/access-to-s3-per-user',  // AWS role arn
   principal:      'arn:aws:iam::010616021751:saml-provider/auth0-provider', // AWS saml provider arn
   domain:         'matugit.auth0.com',                // Auth0 domain

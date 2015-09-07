@@ -1,8 +1,8 @@
 /**
  * Gets the AWS temporal credentials using Auth0 delegation endpoint
  *
- * @param {Object}  role: AWS role arn         
- *                  principal: AWS saml provider arn    
+ * @param {Object}  role: AWS role arn
+ *                  principal: AWS saml provider arn
  *                  domain: Auth0 domain (foo.auth0.com)
  *                  clientID: Auth0 application Client ID
  *                  targetClientId: Auth0 AWS API Client ID
@@ -14,7 +14,7 @@ function get_aws_token(options, callback) {
     callbackURL:    'dummy'
   });
 
-  auth0.getDelegationToken(options.targetClientId, user.get().id_token, { role: options.role, principal: options.principal }, callback);
+  auth0.getDelegationToken({ id_token: user.get().id_token, api: 'aws', role: options.role,  principal: options.principal }, callback);
 }
 
 /**
@@ -27,7 +27,7 @@ function refresh_list(bucket) {
     if (err) console.log(err);
 
     bind_actions(bucket);
-  }); 
+  });
 }
 
 /**
@@ -37,7 +37,7 @@ function refresh_list(bucket) {
  * @param {function} callback
  */
 function list_files(bucket, callback) {
-  bucket.listObjects({Prefix: folder_prefix + user.get().profile.user_id}, function(err, data) { 
+  bucket.listObjects({Prefix: folder_prefix + user.get().profile.user_id}, function(err, data) {
     if (err) return callback(err);
     var files = [];
 
@@ -59,7 +59,7 @@ function list_files(bucket, callback) {
 
 
     callback();
-  });  
+  });
 }
 
 /**
@@ -72,7 +72,7 @@ function remove_file(bucket) {
   return function() {
     bucket.deleteObject({Key: $(this).data('key')}, function(err) {
       if (err) console.log(err);
-      refresh_list(bucket);  
+      refresh_list(bucket);
     });
   }
 }
@@ -100,9 +100,9 @@ function share_file(bucket, client, options) {
  * @param {HTMLInputFile} the file to upload
  */
 function upload_file(bucket, file, callback) {
-  var objKey = folder_prefix + user.get().profile.user_id + '/' + file.name; 
-  var params = {Key: objKey, ContentType: file.type, Body: file, ACL: 'private'}; 
-  bucket.putObject(params, function (err, data) { 
+  var objKey = folder_prefix + user.get().profile.user_id + '/' + file.name;
+  var params = {Key: objKey, ContentType: file.type, Body: file, ACL: 'private'};
+  bucket.putObject(params, function (err, data) {
     if (err) callback(err);
     callback();
   });
@@ -143,7 +143,7 @@ function bind_actions(bucket) {
 function bind_upload(bucket) {
   $('.upload-button').on('click', function() {
     $('.upload-file').click();
-  }); 
+  });
 
   $('.upload-file').on('change', function() {
     $('.glyphicon').hide();
